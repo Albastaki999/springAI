@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ChatController {
 
+    @SuppressWarnings("unused")
     private final EmailReaderService emailReaderService;
     private final EmailService emailService;
     private final ChatClient chatClient;
