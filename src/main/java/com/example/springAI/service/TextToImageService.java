@@ -9,8 +9,9 @@ import java.nio.file.Paths;
 @Service
 public class TextToImageService {
 
-    private static final String API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2";
-    private static final String API_KEY = "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"; // Replace with your key
+    private static final String API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-3.5-large";
+    // private static final String API_KEY = "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"; //usage limit exceeded
+    private static final String API_KEY = "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";
 
     public byte[] generateImage(String prompt) throws Exception {
         RestTemplate restTemplate = new RestTemplate();
