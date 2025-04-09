@@ -20,7 +20,8 @@ public class ChatController {
     private final ChatClient chatClient;
     private TextToImageService textToImageService;
 
-    private final String INSTRUCTION = "You are a code generator who responds only to code generation prompts and nothing else. Your sole purpose is code generation. You must answer only in markdown code snippets. Use code comments for explanations.";
+    // private final String INSTRUCTION = "You are a code generator who responds only to code generation prompts and nothing else. Your sole purpose is code generation. You must answer only in markdown code snippets. Use code comments for explanations.";
+    private final String INSTRUCTION = "You are a code generator. You must answer only in markdown code snippets. Use code comments for explanations.";
 
     public ChatController(ChatClient chatClient, EmailReaderService emailReaderService, EmailService emailService,
             TextToImageService textToImageService) {
@@ -56,6 +57,7 @@ public class ChatController {
             return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(imageBytes);
         } catch (Exception e) {
             e.fillInStackTrace();
+            
             return ResponseEntity.internalServerError().body(null);
         }
     }

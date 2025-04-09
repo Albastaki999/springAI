@@ -18,7 +18,16 @@ public class TextToImageService {
         headers.set("Authorization", "Bearer " + API_KEY);
         headers.set("Content-Type", "application/json");
 
-        String requestBody = "{\"inputs\": \"" + prompt + "\"}";
+        String requestBody = "{"
+                + "\"inputs\": \"" + prompt + "\","
+                + "\"options\": {\"use_cache\": false},"
+                + "\"parameters\": {"
+                + "\"guidance_scale\": 7.5,"
+                + "\"num_inference_steps\": 50,"
+                + "\"seed\": " + (int) (Math.random() * 100000) // 👈 Random seed
+                + "}"
+                + "}";
+
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
 
         // 🔹 Expecting byte[] instead of String to handle image response
@@ -26,7 +35,7 @@ public class TextToImageService {
 
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
             // Save image (optional)
-            Files.write(Paths.get("generated_image.png"), response.getBody());
+            // Files.write(Paths.get("generated_image.png"), response.getBody());
             return response.getBody();
         } else {
             throw new RuntimeException("Failed to generate image: " + response.getStatusCode());
