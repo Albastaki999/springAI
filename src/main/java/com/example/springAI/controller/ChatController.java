@@ -20,7 +20,10 @@ public class ChatController {
     private final ChatClient chatClient;
     private TextToImageService textToImageService;
 
-    public ChatController(ChatClient chatClient, EmailReaderService emailReaderService, EmailService emailService, TextToImageService textToImageService) {
+    private final String INSTRUCTION = "You are a code generator who responds only to code generation prompts and nothing else. Your sole purpose is code generation. You must answer only in markdown code snippets. Use code comments for explanations.";
+
+    public ChatController(ChatClient chatClient, EmailReaderService emailReaderService, EmailService emailService,
+            TextToImageService textToImageService) {
         this.emailReaderService = emailReaderService;
         this.emailService = emailService;
         this.chatClient = chatClient;
@@ -32,7 +35,12 @@ public class ChatController {
         return chatClient.prompt().user(message).call().content();
     }
 
-        @PostMapping("/send")
+    @GetMapping("/code")
+    public String generateCode(@RequestParam("message") String message) {
+        return chatClient.prompt().user(INSTRUCTION + message).call().content();
+    }
+
+    @PostMapping("/send")
     public String sendEmail(
             @RequestParam String to,
             @RequestParam String subject,
