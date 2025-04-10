@@ -7,7 +7,8 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class TextToMusicService {
 
-    private static final String API_URL = "https://api-inference.huggingface.co/models/facebook/musicgen-small";
+    // private static final String API_URL = "https://api-inference.huggingface.co/models/facebook/musicgen-small";
+    private static final String API_URL = "https://api-inference.huggingface.co/models/facebook/musicgen-medium";
     private static final String API_KEY = "Bearer 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"; // 🔒 Replace with your HF token
 
     public byte[] generateMusic(String prompt) {
