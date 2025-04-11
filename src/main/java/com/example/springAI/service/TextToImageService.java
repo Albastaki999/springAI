@@ -9,38 +9,43 @@ import java.nio.file.Paths;
 @Service
 public class TextToImageService {
 
-    // private static final String API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-3.5-large";
-    private static final String API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2";
-    // private static final String API_KEY = "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"; //usage limit exceeded
-    private static final String API_KEY = "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";
+    private static final String API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-3.5-large";
+    private static final String[] API_KEYS = {
+        "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",
+        "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",
+        "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"
+    };
 
     public byte[] generateImage(String prompt) throws Exception {
         RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + API_KEY);
-        headers.set("Content-Type", "application/json");
-
         String requestBody = "{"
                 + "\"inputs\": \"" + prompt + "\","
                 + "\"options\": {\"use_cache\": false},"
                 + "\"parameters\": {"
                 + "\"guidance_scale\": 7.5,"
                 + "\"num_inference_steps\": 50,"
-                + "\"seed\": " + (int) (Math.random() * 100000) // 👈 Random seed
+                + "\"seed\": " + (int) (Math.random() * 100000)
                 + "}"
                 + "}";
 
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+        for (String apiKey : API_KEYS) {
+            try {
+                HttpHeaders headers = new HttpHeaders();
+                headers.set("Authorization", "Bearer " + apiKey);
+                headers.set("Content-Type", "application/json");
 
-        // 🔹 Expecting byte[] instead of String to handle image response
-        ResponseEntity<byte[]> response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, byte[].class);
+                HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+                ResponseEntity<byte[]> response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, byte[].class);
 
-        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-            // Save image (optional)
-            // Files.write(Paths.get("generated_image.png"), response.getBody());
-            return response.getBody();
-        } else {
-            throw new RuntimeException("Failed to generate image: " + response.getStatusCode());
+                if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                    return response.getBody(); // return image if successful
+                }
+            } catch (Exception ex) {
+                // Ignore and try next key
+                System.out.println("API key failed: " + apiKey + " ➜ " + ex.getMessage());
+            }
         }
+
+        throw new RuntimeException("All API keys exhausted or failed.");
     }
 }
