@@ -14,7 +14,9 @@ public class TextToImageService {
         "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",
         "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",
         "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",
-        "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" // muqsithali8@gmail.com
+        "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", // muqsithali8@gmail.com
+        "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", //muqsithak@gmail.com
+        "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" //imaaz2003@gmail.com
     };
 
     public byte[] generateImage(String prompt) throws Exception {
