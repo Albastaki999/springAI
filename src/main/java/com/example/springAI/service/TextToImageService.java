@@ -13,7 +13,8 @@ public class TextToImageService {
     private static final String[] API_KEYS = {
         "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",
         "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",
-        "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"
+        "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",
+        "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" // muqsithali8@gmail.com
     };
 
     public byte[] generateImage(String prompt) throws Exception {

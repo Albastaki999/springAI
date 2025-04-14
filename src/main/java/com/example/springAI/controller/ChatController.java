@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatController {
 
     @SuppressWarnings("unused")
-    private final EmailReaderService emailReaderService;
     private final EmailService emailService;
     private final ChatClient chatClient;
     private TextToImageService textToImageService;
@@ -31,10 +30,12 @@ public class ChatController {
     // generation. You must answer only in markdown code snippets. Use code comments
     // for explanations.";
     private final String INSTRUCTION = "You are a code generator. You must answer only in markdown code snippets. Use code comments for explanations.";
+    private final String EMAIL_INSTRUCTION = "You are an email body generator. Your output should be the main content of the email only. Do NOT include any email subject lines, or sender/receiver information. The output must be plain, context-specific email body text suitable for insertion into an email template.";
 
-    public ChatController(ChatClient chatClient, EmailReaderService emailReaderService, EmailService emailService,
-            TextToImageService textToImageService, TextToVideoService textToVideoService, TextToMusicService textToMusicService) {
-        this.emailReaderService = emailReaderService;
+    public ChatController(ChatClient chatClient, EmailService emailService,
+            TextToImageService textToImageService, TextToVideoService textToVideoService,
+            TextToMusicService textToMusicService) {
+        // this.emailReaderService = emailReaderService;
         this.emailService = emailService;
         this.chatClient = chatClient;
         this.textToImageService = textToImageService;
@@ -56,9 +57,17 @@ public class ChatController {
     public String sendEmail(
             @RequestParam String to,
             @RequestParam String subject,
-            @RequestParam("message") String message) {
-        emailService.sendHtmlEmail(to, subject, chatClient.prompt().user(message).call().content());
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam("body") String body) {
+        emailService.sendHtmlEmail(to, subject, username, password, body);
         return "Email sent successfully!";
+    }
+
+    @GetMapping("/generate-email-prompt")
+    public String sendEmail(
+            @RequestParam String prompt) {
+        return chatClient.prompt().user(EMAIL_INSTRUCTION + prompt).call().content();
     }
 
     @GetMapping(value = "/generate", produces = MediaType.IMAGE_PNG_VALUE)
