@@ -5,8 +5,10 @@ import com.example.springAI.service.EmailService;
 import com.example.springAI.service.TextToImageService;
 import com.example.springAI.service.TextToMusicService;
 import com.example.springAI.service.TextToVideoService;
+import com.example.springAI.service.TranscriptService;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,12 +26,15 @@ public class ChatController {
     private TextToImageService textToImageService;
     private TextToVideoService textToVideoService;
     private TextToMusicService textToMusicService;
+    @Autowired
+    private TranscriptService service;
 
     // private final String INSTRUCTION = "You are a code generator who responds
     // only to code generation prompts and nothing else. Your sole purpose is code
     // generation. You must answer only in markdown code snippets. Use code comments
     // for explanations.";
     private final String INSTRUCTION = "You are a code generator. You must answer only in markdown code snippets. Use code comments for explanations.";
+    private final String SUMMARIZE_INSTRUCTION = "Summarize the following transcript obtained from youtube video. Just provide the summary directly and nothing else";
     private final String EMAIL_INSTRUCTION = "You are an email body generator. Your output should be the main content of the email only. Do NOT include any email subject lines, or sender/receiver information. The output must be plain, context-specific email body text suitable for insertion into an email template.";
 
     public ChatController(ChatClient chatClient, EmailService emailService,
@@ -63,6 +68,13 @@ public class ChatController {
         emailService.sendHtmlEmail(to, subject, username, password, body);
         return "Email sent successfully!";
     }
+
+    @GetMapping("/summarize")
+    public String getTranscript(@RequestParam String url) {
+        String transcript = service.fetchTranscript(url);
+        return chatClient.prompt().user(SUMMARIZE_INSTRUCTION + transcript).call().content();
+    }
+    
 
     @GetMapping("/generate-email-prompt")
     public String sendEmail(
