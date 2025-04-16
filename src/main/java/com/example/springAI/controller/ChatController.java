@@ -1,12 +1,5 @@
 package com.example.springAI.controller;
 
-import com.example.springAI.service.EmailReaderService;
-import com.example.springAI.service.EmailService;
-import com.example.springAI.service.TextToImageService;
-import com.example.springAI.service.TextToMusicService;
-import com.example.springAI.service.TextToVideoService;
-import com.example.springAI.service.TranscriptService;
-
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +9,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.example.springAI.service.EmailService;
+import com.example.springAI.service.TextToImageService;
+import com.example.springAI.service.TextToMusicService;
+import com.example.springAI.service.TextToVideoService;
+import com.example.springAI.service.TranscriptService;
 
 @RestController
 public class ChatController {
@@ -35,7 +34,7 @@ public class ChatController {
     // for explanations.";
     private final String INSTRUCTION = "You are a code generator. You must answer only in markdown code snippets. Use code comments for explanations.";
     private final String SUMMARIZE_INSTRUCTION = "Summarize the following transcript obtained from youtube video. Just provide the summary directly and nothing else";
-    private final String EMAIL_INSTRUCTION = "You are an email body generator. Your output should be the main content of the email only. Do NOT include any email subject lines, or sender/receiver information. The output must be plain, context-specific email body text suitable for insertion into an email template.";
+    private final String EMAIL_INSTRUCTION = "You are an email body generator. Your output should be the main content of the email only. Do NOT include any email subject lines, or sender/receiver information. The output must be plain, context-specific email body text suitable for insertion into an email template. do not use square brackets";
 
     public ChatController(ChatClient chatClient, EmailService emailService,
             TextToImageService textToImageService, TextToVideoService textToVideoService,
@@ -74,7 +73,6 @@ public class ChatController {
         String transcript = service.fetchTranscript(url);
         return chatClient.prompt().user(SUMMARIZE_INSTRUCTION + transcript).call().content();
     }
-    
 
     @GetMapping("/generate-email-prompt")
     public String sendEmail(
@@ -117,6 +115,13 @@ public class ChatController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(null);
         }
+    }
+
+    @GetMapping("/generate-questions")
+    public String generateQuestions(@RequestParam String topic, @RequestParam int no, @RequestParam String difficulty) {
+        return chatClient.prompt().user("create " + no + " questions of " + topic
+                + "and give me in an array in json with example format of :- [{question:'What is ...', options:[A,B,C,D], correct:0},...]. Options must be 4. Difficulty: "
+                + difficulty + " . just return json. no other text except it").call().content();
     }
 
 }
