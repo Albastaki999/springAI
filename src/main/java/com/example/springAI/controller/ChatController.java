@@ -121,7 +121,7 @@ public class ChatController {
     public String generateQuestions(@RequestParam String topic, @RequestParam int no, @RequestParam String difficulty) {
         return chatClient.prompt().user("create " + no + " questions of " + topic
                 + "and give me in an array in json with example format of :- [{question:'What is ...', options:[A,B,C,D], correct:0},...]. Options must be 4. Difficulty: "
-                + difficulty + " . just return json. no other text except it").call().content();
+                + difficulty + " . just return json. No other text except it").call().content();
     }
 
 }
